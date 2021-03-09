@@ -1,3 +1,11 @@
 {
-    "python.pythonPath": "/home/max/github/Surf-Backend/env/bin/python3.9"
+    "python.pythonPath": "/home/max/github/Surf-Backend/env/bin/python3.9",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:Surf-Backend}/db.sqlite3",
+            "name": "Surf"
+        }
+    ]
 }
