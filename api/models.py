@@ -26,7 +26,7 @@ class Beach(models.Model):
 class Tide(models.Model):
     beach = models.ForeignKey(Beach, on_delete=models.CASCADE)
     date = models.DateField()
-    time = models.CharField(max_length=5, choices=time_choices)
+    hours = models.CharField(max_length=5, choices=time_choices)
     tide_choices = [
         ('0', 'low'),
         ('1', 'high')
@@ -41,14 +41,14 @@ class Tide(models.Model):
 class Weather(models.Model):
     beach = models.ForeignKey(Beach, on_delete=models.CASCADE)
     date = models.DateField()
-    time = models.CharField(max_length=5, choices=time_choices)
+    hours = models.CharField(max_length=5, choices=time_choices)
     # in °C
     air_temperature = models.DecimalField(max_digits=4, decimal_places=2)
     cloud_cover = models.DecimalField(max_digits=5, decimal_places=2)  # in %
     # in m/s
-    wind_speed = models.DecimalField(max_digits=5, decimal_places=2)
+    windSpeed = models.DecimalField(max_digits=5, decimal_places=2)
     # in ° from 0 (from N) to 360
-    wind_direction = models.DecimalField(max_digits=7, decimal_places=4)
+    windDirection = models.DecimalField(max_digits=7, decimal_places=4)
 
     def __str__(self):
         return str(self.beach) + " - " + str(self.date) + " - " + str(self.time) + ":00"
@@ -57,13 +57,13 @@ class Weather(models.Model):
 class Wave(models.Model):
     beach = models.ForeignKey(Beach, on_delete=models.CASCADE)
     date = models.DateField()
-    time = models.CharField(max_length=5, choices=time_choices)
+    hours = models.CharField(max_length=5, choices=time_choices)
     # in ° from 0 (from N) to 360
-    wave_direction = models.DecimalField(max_digits=7, decimal_places=4)
-    wave_height = models.DecimalField(max_digits=5, decimal_places=2)  # in m
-    wave_period = models.DecimalField(max_digits=5, decimal_places=2)  # in s
+    waveDirection = models.DecimalField(max_digits=7, decimal_places=4)
+    waveHeight = models.DecimalField(max_digits=5, decimal_places=2)  # in m
+    wavePeriod = models.DecimalField(max_digits=5, decimal_places=2)  # in s
     # in °C
-    water_temperature = models.DecimalField(max_digits=4, decimal_places=2)
+    waterTemperature = models.DecimalField(max_digits=4, decimal_places=2)
 
     def __str__(self):
-        return str(self.beach) + " - " + str(self.date) + " - " + str(self.time) + ":00"
+        return str(self.beach) + " - " + str(self.time)

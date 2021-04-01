@@ -1,8 +1,10 @@
 from django.http import HttpResponse
-
+from .serializers import TideSerializer, WeatherSerializer, WaveSerializer
 import requests
 import arrow
 import pandas as pd
+import json
+from decimal import Decimal
 ''' from celery.schedules import crontab
 from celery.task import periodic_task '''
 
@@ -12,72 +14,93 @@ from .models import Beach, Wave, Weather, Tide
 
 
 def api_call(request):
+    # load API key
     with open("storm_API.txt", "r") as f:
         apiKey = f.read()
 
-    # %% Fetch data from stormglass
-    # Get first hour of today
+    # Get first and last hour of today
     start = arrow.utcnow().replace(hour=0, minute=0, second=0)
-
-    # Get last hour of today
     end = start.shift(days=+6)
 
-    response = requests.get(
-        'https://api.stormglass.io/v2/weather/point',
-        params={
-            'lat': 47.72,
-            'lng': -3.49,
-            'params': ','.join(['waveHeight', 'airTemperature',
-                                'waterTemperature',
-                                'waveDirection', 'waveHeight', 'wavePeriod',
-                                'windSpeed', 'windDirection']),
-            'start': start.timestamp(),  # Convert to timestamp
-            'end': end.timestamp(),  # Convert to UTC timestamp
-            'source': 'noaa'
-        },
-        headers={
-            'Authorization': apiKey
-        }
-    )
+    beaches = Beach.objects.all()
 
-    data = response.json()
+    for beach in beaches:
 
-    flattened_data = pd.json_normalize(data)
-    flatClean = pd.DataFrame()
+        response = requests.get(
+            'https://api.stormglass.io/v2/weather/point',
+            params={
+                'lat': beach.lat,
+                'lng': beach.lng,
+                'params': ','.join(['waveHeight', 'airTemperature',
+                                    'waterTemperature',
+                                    'waveDirection', 'waveHeight', 'wavePeriod',
+                                    'windSpeed', 'windDirection']),
+                'start': start.timestamp(),  # Convert to timestamp
+                'end': end.timestamp(),  # Convert to UTC timestamp
+                'source': 'noaa'
+            },
+            headers={
+                'Authorization': apiKey
+            }
+        )
 
-    col_one_list = flattened_data['time'].tolist()
+        data = response.json()['hours']
 
-    col_one_list = [((arrow.get(hour)).shift(hours=+2)
-                     ).format('YYYY-MM-DD HH:mm') for hour in col_one_list]
-    flattened_data["time"] = col_one_list
+        flattened_data = pd.json_normalize(data)
+        flatClean = pd.DataFrame()
 
-    # Remove noaa from column header
-    for i in flattened_data:
-        flattened_data.rename(columns={i: i.split('.', 1)[0]}, inplace=True)
+        col_one_list = flattened_data['time'].tolist()
 
-    # Delete all but the selected hours
-    flattened_data['date'], flattened_data['hour'] = flattened_data['time'].str.split(
-        ' ', 1).str
-    flattened_data.pop("time")
-    hours = ["06:00",
-             "09:00",
-             "12:00",
-             "15:00",
-             "18:00",
-             "21:00",
-             ]
-    flatClean = flattened_data[flattened_data.hour.isin(hours)]
+        col_one_list = [((arrow.get(hour)).shift(hours=+2)
+                         ).format('YYYY-MM-DD HH:mm') for hour in col_one_list]
+        flattened_data["time"] = col_one_list
 
-    cleanjson = json.loads(flatClean.to_json(orient="records"))
+        # Remove noaa from column header
+        for i in flattened_data:
+            flattened_data.rename(
+                columns={i: i.split('.', 1)[0]}, inplace=True)
 
-    # now write output to a file
-    cleandata = open("data.json", "w")
-    cleandata.write(json.dumps(cleanjson, indent=4, sort_keys=True))
-    cleandata.close()
+        # Delete all but the selected hours
+        flattened_data['date'], flattened_data['hour'] = flattened_data['time'].str.split(
+            ' ', 1).str
+        flattened_data.pop("time")
+        hours = ["06:00",
+                 "09:00",
+                 "12:00",
+                 "15:00",
+                 "18:00",
+                 "21:00",
+                 ]
+        flatClean = flattened_data[flattened_data.hour.isin(hours)]
 
-    return HttpResponse("Hello, world")
+        cleanjson = json.loads(flatClean.to_json(orient="records"))
 
-    # %% tide data
+        for point in cleanjson:
+            Wave_serializer = WaveSerializer(data=point)
+            if Wave_serializer.is_valid():
+                embed = Wave_serializer.save()
+            else:
+                print(Wave_serializer.errors)
+
+        return HttpResponse("Muy bueno")
+
+
+"""
+        for datapoint in cleanjson:
+            wavedata = Wave(
+                beach=beach,
+                date=datapoint['date'],
+                time=datapoint['hour'],
+                wave_direction=datapoint['waveDirection'],
+                wave_height=datapoint['waveHeight'],
+                wave_period=datapoint['wavePeriod'],
+                water_temperature=datapoint['waterTemperature']
+            )
+            wavedata.save()
+
+    return HttpResponse("Hello, world") """
+
+# %% tide data
 
 
 '''     with open("dataTideApi.json", "r") as json_file:
