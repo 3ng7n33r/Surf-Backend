@@ -65,7 +65,7 @@ def api_call(request):
     for beach in beaches:
         waveweather(beach)
         tiderecorder(beach)
-    return redirect("")
+    return redirect("/api/")
 
 
 def tiderecorder(beach):
