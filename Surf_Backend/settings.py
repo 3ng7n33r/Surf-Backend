@@ -10,13 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import django-heroku
-import django_heroku
 from pathlib import Path
 import os
-<< << << < HEAD
-== == == =
->>>>>> > 14c18afe6f842755bc1fcb77ddd46f1e3226e115
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,4 +130,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Activate Django-Heroku.
 # Configure Django App for Heroku.
+import django_heroku
 django_heroku.settings(locals())
