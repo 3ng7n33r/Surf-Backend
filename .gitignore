@@ -1,4 +1,5 @@
 storm_API.txt
+migrations/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -4,7 +4,6 @@ import requests
 import arrow
 import pandas as pd
 import json
-from decimal import Decimal
 ''' from celery.schedules import crontab
 from celery.task import periodic_task '''
 
@@ -19,6 +18,7 @@ def api_call(request):
 
     for beach in beaches:
         print('start')
+
         waveweather(beach)
         tiderecorder(beach)
 
@@ -41,14 +41,13 @@ def tiderecorder(beach):
         params={
             'lat': beach.lat,
             'lng': beach.lng,
-            'start': start.to('UTC').timestamp,  # Convert to UTC timestamp
-            'end': end.to('UTC').timestamp,  # Convert to UTC timestam
+            'start': start.timestamp(),  # Convert to timestamp
+            'end': end.timestamp(),  # Convert to UTC timestamp
         },
         headers={
             'Authorization': apiKey
         }
     )
-
     json_tides = response.json()['data']
 
     flattened_data = pd.json_normalize(json_tides)
@@ -56,10 +55,13 @@ def tiderecorder(beach):
     col_one_list = [((arrow.get(hour)).shift(hours=+2)
                      ).format('YYYY-MM-DD HH:mm') for hour in col_one_list]
     flattened_data["time"] = col_one_list
+    flattened_data.columns = flattened_data.columns.str.replace("type", "tide")
+    flattened_data = flattened_data.round(2)
 
     flattened_data['date'], flattened_data['hour'] = flattened_data['time'].str.split(
         ' ', 1).str
     flattened_data.pop("time")
+    flattened_data['beach'] = beach.id
 
     cleanjson = json.loads(flattened_data.to_json(orient="records"))
 
@@ -67,7 +69,6 @@ def tiderecorder(beach):
         Tide_serializer = TideSerializer(data=point)
         if Tide_serializer.is_valid():
             embed = Tide_serializer.save()
-            print('Muy bueno')
         else:
             print(Tide_serializer.errors)
 
@@ -137,70 +138,7 @@ def waveweather(beach):
         Wave_serializer = WaveSerializer(data=point)
         if Wave_serializer.is_valid():
             embed = Wave_serializer.save()
-            print('Muy bueno')
         else:
             print(Wave_serializer.errors)
 
-    for point in cleanjson:
-        Weather_serializer = WeatherSerializer(data=point)
-        if Weather_serializer.is_valid():
-            embed = Weather_serializer.save()
-            print('Muy bueno')
-        else:
-            print(Weather_serializer.errors)
-
     return True
-
-
-"""
-        for datapoint in cleanjson:
-            wavedata = Wave(
-                beach=beach,
-                date=datapoint['date'],
-                time=datapoint['hour'],
-                wave_direction=datapoint['waveDirection'],
-                wave_height=datapoint['waveHeight'],
-                wave_period=datapoint['wavePeriod'],
-                water_temperature=datapoint['waterTemperature']
-            )
-            wavedata.save()
-
-    return HttpResponse("Hello, world") """
-
-# %% tide data
-
-
-'''     with open("dataTideApi.json", "r") as json_file:
-        tides = json.load(json_file)
-        
-    testdata = tides["data"]
-    flattened_data = pd.json_normalize(testdata)
-    col_one_list = flattened_data['time'].tolist()
-    col_one_list = [((arrow.get(hour)).shift(hours=+2)).format('YYYY-MM-DD HH:mm') for hour in col_one_list]
-    flattened_data["time"] = col_one_list
-
-    flattened_data['date'], flattened_data['hour'] = flattened_data['time'].str.split(' ', 1).str
-    flattened_data.pop("time")
-
-    cleanjson = json.loads(flattened_data.to_json(orient="records"))
-
-    # now write output to a file
-    cleandata = open("tides.json", "w")
-    # magic happens here to make it pretty-printed
-    cleandata.write(simplejson.dumps(cleanjson, indent=4, sort_keys=True))
-    cleandata.close() '''
-
-'''     # %% Fetch tide data
-
-    response = requests.get(
-        'https://api.stormglass.io/v2/tide/extremes/point',
-        params={
-            'lat': 47.72,
-            'lng': -3.49,
-            'start': start.to('UTC').timestamp(),  # Convert to UTC timestamp
-            'end': end.to('UTC').timestamp(),  # Convert to UTC timestam
-        },
-        headers={
-            'Authorization': apiKey
-        }
-    ) '''
