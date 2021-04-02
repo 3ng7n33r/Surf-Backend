@@ -1,0 +1,42 @@
+[
+    {
+        "model": "api.beach",
+        "pk": 1,
+        "fields": {
+            "name": "Siouville",
+            "lat": "49.5700",
+            "lng": "-1.8500",
+            "orientation": "280.0000"
+        }
+    },
+    {
+        "model": "api.beach",
+        "pk": 2,
+        "fields": {
+            "name": "Longchamps",
+            "lat": "48.6366",
+            "lng": "-2.1212",
+            "orientation": "320.0000"
+        }
+    },
+    {
+        "model": "api.beach",
+        "pk": 3,
+        "fields": {
+            "name": "Cap Fréhel",
+            "lat": "48.6566",
+            "lng": "-2.0071",
+            "orientation": "315.0000"
+        }
+    },
+    {
+        "model": "api.beach",
+        "pk": 4,
+        "fields": {
+            "name": "Sainte Barbe",
+            "lat": "47.5968",
+            "lng": "-3.1551",
+            "orientation": "160.0000"
+        }
+    }
+]
