@@ -1,5 +1,11 @@
 from django.http import HttpResponse
 from .serializers import TideSerializer, WeatherSerializer, WaveSerializer
+
+from rest_framework import generics, viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
+
 import requests
 import arrow
 import pandas as pd
@@ -12,18 +18,28 @@ from .models import Beach, Wave, Weather, Tide
 ''' @periodic_task(run_every=crontab(hour=7, minute=30, day_of_week="mon")) '''
 
 
+class WaveViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides `list` and `retrieve` actions.
+    """
+    queryset = Wave.objects.all()
+    serializer_class = WaveSerializer
+
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'waves': reverse('wave-list', request=request, format=format),
+    })
+
+
 def api_call(request):
 
     beaches = Beach.objects.all()
 
     for beach in beaches:
-        print('start')
-
         waveweather(beach)
         tiderecorder(beach)
-
-        print('end')
-
     return HttpResponse("Muy bueno")
 
 
