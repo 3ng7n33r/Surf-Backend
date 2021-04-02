@@ -18,3 +18,9 @@ class TideSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tide
         fields = '__all__'
+
+
+class BeachSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Beach
+        fields = '__all__'

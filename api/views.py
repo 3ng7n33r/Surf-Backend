@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from .serializers import TideSerializer, WeatherSerializer, WaveSerializer
+from .serializers import TideSerializer, WeatherSerializer, WaveSerializer, BeachSerializer
 
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
@@ -24,6 +24,30 @@ class WaveViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Wave.objects.all()
     serializer_class = WaveSerializer
+
+
+class WeatherViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides `list` and `retrieve` actions.
+    """
+    queryset = Weather.objects.all()
+    serializer_class = WeatherSerializer
+
+
+class TideViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides `list` and `retrieve` actions.
+    """
+    queryset = Tide.objects.all()
+    serializer_class = TideSerializer
+
+
+class BeachViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides `list` and `retrieve` actions.
+    """
+    queryset = Beach.objects.all()
+    serializer_class = BeachSerializer
 
 
 @api_view(['GET'])
