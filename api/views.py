@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from .serializers import TideSerializer, WeatherSerializer, WaveSerializer, BeachSerializer
 
 from rest_framework import generics, viewsets
@@ -64,7 +65,7 @@ def api_call(request):
     for beach in beaches:
         waveweather(beach)
         tiderecorder(beach)
-    return HttpResponse("Muy bueno")
+    return redirect("")
 
 
 def tiderecorder(beach):
