@@ -12,6 +12,6 @@ router.register(r'beach', views.BeachViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path('', include(router.urls)),
-    path('collectdata/', views.api_call)
+    path('api/', include(router.urls)),
+    path('', views.api_call)
 ]
