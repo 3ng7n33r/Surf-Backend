@@ -11,36 +11,8 @@ import requests
 import arrow
 import pandas as pd
 import json
-''' from celery.schedules import crontab
-from celery.task import periodic_task '''
 
 from .models import Beach, Wave, Weather, Tide
-
-''' @periodic_task(run_every=crontab(hour=7, minute=30, day_of_week="mon")) '''
-
-
-class WaveViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    This viewset automatically provides `list` and `retrieve` actions.
-    """
-    queryset = Wave.objects.all()
-    serializer_class = WaveSerializer
-
-
-class WeatherViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    This viewset automatically provides `list` and `retrieve` actions.
-    """
-    queryset = Weather.objects.all()
-    serializer_class = WeatherSerializer
-
-
-class TideViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    This viewset automatically provides `list` and `retrieve` actions.
-    """
-    queryset = Tide.objects.all()
-    serializer_class = TideSerializer
 
 
 class BeachViewSet(viewsets.ReadOnlyModelViewSet):
@@ -51,11 +23,6 @@ class BeachViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BeachSerializer
 
 
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'waves': reverse('wave-list', request=request, format=format),
-    })
 
 
 def api_call(request):

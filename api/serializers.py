@@ -21,6 +21,7 @@ class TideSerializer(serializers.ModelSerializer):
 
 
 class BeachSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Beach
         fields = '__all__'

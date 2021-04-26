@@ -22,6 +22,9 @@ class Beach(models.Model):
     def __str__(self):
         return self.name
 
+'''     def ReturnTides(self, pk):
+        return Beach.objects.get(pk=pk).tide_set.all() '''
+
 
 class Tide(models.Model):
     beach = models.ForeignKey(Beach, on_delete=models.CASCADE)
